@@ -1,0 +1,12 @@
+{
+  "comfy_custom_nodes/crop_integrity/segmentation_fallback.py": "ec0e4d0c996be074a755e9c63421d6d10eb018f9ae8a1afebc1107dfa238d6a8",
+  "comfy_custom_nodes/crop_integrity/segmentation_rescue.py": "073a7e875c49f0487ac8705ec1186dffa4fc5228a93f785d8a9080420f1b5032",
+  "comfy_custom_nodes/crop_integrity/semantic_parser.py": "59487c4bce77d8795264ddc0699247cd74c3c70fe5572be1561bed0c28213522",
+  "prepare_models.py": "5a4982362bc5a02f4fb36024ebab82a237c59877aaf56fac19a5f1c16b0ccef8",
+  "tests/test_segmentation_rescue.py": "a042d4691eaccdc92c95e0b378e94597bd3181b701da9d6e412929cb3b0d8946",
+  "comfy_custom_nodes/crop_integrity/vendor/schp/architecture.py": "9092adf2e3c932f5559c4b16e1067cff268c2959358a9f2a5ab4f4497d7703b1",
+  "comfy_custom_nodes/crop_integrity/vendor/schp/LICENSE": "095791f7f830b929a5c4c5bd8fb9e62a1694336fc6b915f771e25a44015c403c",
+  "comfy_custom_nodes/crop_integrity/vendor/schp/provenance.json": "4e7f0ba69a38b17ce6817690aff77e5d685c3672b1b4b858197d8af338fee0bc",
+  "comfy_custom_nodes/crop_integrity/vendor/schp/__init__.py": "fe7d8a8538ba4be5d963933ccb442a14a30965e57d6eeaa0dcbb802e33863f50",
+  "comfy_custom_nodes/crop_integrity/vendor/schp/transforms.py": "196e0ef23983b20838001a832250dd72819ffe17dfb583fa949093dcfb70af07"
+}

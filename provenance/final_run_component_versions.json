@@ -1,0 +1,208 @@
+{
+  "repositories": [
+    {
+      "path": "/opt/ComfyUI",
+      "commit": "b8f848bfe38be79b9dba693bc7a214c9aefd597a",
+      "dirty": " D input/example.png\n D models/audio_encoders/put_audio_encoder_models_here\n D models/checkpoints/put_checkpoints_here\n D models/clip/put_clip_or_text_encoder_models_here\n D models/clip_vision/put_clip_vision_models_here\n D models/configs/anything_v3.yaml\n D models/configs/v1-inference.yaml\n D models/configs/v1-inference_clip_skip_2.yaml\n D models/configs/v1-inference_clip_skip_2_fp16.yaml\n D models/configs/v1-inference_fp16.yaml\n D models/configs/v1-inpainting-inference.yaml\n D models/configs/v2-inference-v.yaml\n D models/configs/v2-inference-v_fp32.yaml\n D models/configs/v2-inference.yaml\n D models/configs/v2-inference_fp32.yaml\n D models/configs/v2-inpainting-inference.yaml\n D models/controlnet/put_controlnets_and_t2i_here\n D models/diffusers/put_diffusers_models_here\n D models/diffusion_models/put_diffusion_model_files_here\n D models/embeddings/put_embeddings_or_textual_inversion_concepts_here\n D models/gligen/put_gligen_models_here\n D models/hypernetworks/put_hypernetworks_here\n D models/latent_upscale_models/put_latent_upscale_models_here\n D models/loras/put_loras_here\n D models/model_patches/put_model_patches_here\n D models/photomaker/put_photomaker_models_here\n D models/style_models/put_t2i_style_model_here\n D models/text_encoders/put_text_encoder_files_here\n D models/unet/put_unet_files_here\n D models/upscale_models/put_esrgan_and_other_upscale_models_here\n D models/vae/put_vae_here\n D models/vae_approx/put_taesd_encoder_pth_and_taesd_decoder_pth_here\n D output/_output_images_will_be_put_here\n"
+    },
+    {
+      "path": "/opt/ComfyUI/custom_nodes/ComfyUI-GGUF",
+      "commit": "6ea2651e7df66d7585f6ffee804b20e92fb38b8a",
+      "dirty": ""
+    },
+    {
+      "path": "/opt/ComfyUI/custom_nodes/ComfyUI-Inpaint-Nodes",
+      "commit": "b02942210daad35db71f654038cebd541e81fe17",
+      "dirty": ""
+    },
+    {
+      "path": "/opt/ComfyUI/custom_nodes/ComfyUI_essentials",
+      "commit": "9d9f4bedfc9f0321c19faf71855e228c93bd0dc9",
+      "dirty": ""
+    },
+    {
+      "path": "/opt/ComfyUI/custom_nodes/Comfyui-In-Context-Lora-Utils",
+      "commit": "ede1f33f5889f9f6d5bcb3cc54a5904869f31a41",
+      "dirty": "?? __pycache__/\n"
+    },
+    {
+      "path": "/opt/ComfyUI/custom_nodes/comfyui_segment_anything",
+      "commit": "ab6395596399d5048639cdab7e44ec9fae857a93",
+      "dirty": " M local_groundingdino/models/GroundingDINO/bertwarper.py\n"
+    }
+  ],
+  "local_crop_integrity": {
+    "commit": null,
+    "reason": "Locally supplied custom nodes, not a separate git repository",
+    "files_sha256": {
+      "segmentation_rescue.py": "073a7e875c49f0487ac8705ec1186dffa4fc5228a93f785d8a9080420f1b5032",
+      "__init__.py": "dbbad22377ac96bdeac7cf30cf8798378c7d5f7bf4c48dbd66445c3f7c9cd14b",
+      "segmentation_fallback.py": "ec0e4d0c996be074a755e9c63421d6d10eb018f9ae8a1afebc1107dfa238d6a8",
+      "semantic_parser.py": "59487c4bce77d8795264ddc0699247cd74c3c70fe5572be1561bed0c28213522",
+      "vendor/schp/architecture.py": "9092adf2e3c932f5559c4b16e1067cff268c2959358a9f2a5ab4f4497d7703b1",
+      "vendor/schp/LICENSE": "095791f7f830b929a5c4c5bd8fb9e62a1694336fc6b915f771e25a44015c403c",
+      "vendor/schp/provenance.json": "4e7f0ba69a38b17ce6817690aff77e5d685c3672b1b4b858197d8af338fee0bc",
+      "vendor/schp/__init__.py": "fe7d8a8538ba4be5d963933ccb442a14a30965e57d6eeaa0dcbb802e33863f50",
+      "vendor/schp/transforms.py": "196e0ef23983b20838001a832250dd72819ffe17dfb583fa949093dcfb70af07"
+    }
+  },
+  "patched_bertwarper_sha256": "f1f3b64a88e636d6684c54de1620e9fba1715bb245a4c1758913d6caa35a7489",
+  "patched_bertwarper_diff": "diff --git a/local_groundingdino/models/GroundingDINO/bertwarper.py b/local_groundingdino/models/GroundingDINO/bertwarper.py\nindex e209a39..8ff68a3 100644\n--- a/local_groundingdino/models/GroundingDINO/bertwarper.py\n+++ b/local_groundingdino/models/GroundingDINO/bertwarper.py\n@@ -22,7 +22,16 @@ class BertModelWarper(nn.Module):\n \n         self.get_extended_attention_mask = bert_model.get_extended_attention_mask\n         self.invert_attention_mask = bert_model.invert_attention_mask\n-        self.get_head_mask = bert_model.get_head_mask\n+        # transformers compatibility: some versions don't expose get_head_mask on model instances\n+        if hasattr(bert_model, 'get_head_mask'):\n+            self.get_head_mask = bert_model.get_head_mask\n+        else:\n+            try:\n+                from transformers.modeling_utils import PreTrainedModel\n+                self.get_head_mask = PreTrainedModel.get_head_mask.__get__(bert_model, bert_model.__class__)\n+            except Exception:\n+                # GroundingDINO doesn't rely on head masks for our use-case.\n+                self.get_head_mask = lambda head_mask, num_hidden_layers, is_attention_chunked=False: [None] * num_hidden_layers\n \n     def forward(\n         self,\n@@ -103,7 +112,7 @@ class BertModelWarper(nn.Module):\n         # We can provide a self-attention mask of dimensions [batch_size, from_seq_length, to_seq_length]\n         # ourselves in which case we just need to make it broadcastable to all heads.\n         extended_attention_mask: torch.Tensor = self.get_extended_attention_mask(\n-            attention_mask, input_shape, device\n+            attention_mask, input_shape\n         )\n \n         # If a 2D or 3D attention mask is provided for the cross-attention\n",
+  "recorded_final_environment": {
+    "python": "3.10.12",
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "commits": {
+      "ComfyUI": "b8f848bfe38be79b9dba693bc7a214c9aefd597a",
+      "ICLoRA": "ede1f33f5889f9f6d5bcb3cc54a5904869f31a41",
+      "segment_anything": "ab6395596399d5048639cdab7e44ec9fae857a93",
+      "essentials": "9d9f4bedfc9f0321c19faf71855e228c93bd0dc9"
+    }
+  },
+  "recorded_initial_fix_environment": "experiments/results/crop_fix_rerun_20261118/environment.json",
+  "parser_provenance": {
+    "source": "external_vtons/catvton/model/SCHP",
+    "git_commit": "7818397f25613beedb3d861a34769f607cfcf3b1",
+    "weights_hf_snapshot": "2969fcf85fe62f2036605716f0b56f0b81d01d79",
+    "files": {
+      "comfy_custom_nodes/crop_integrity/vendor/schp/architecture.py": "9092adf2e3c932f5559c4b16e1067cff268c2959358a9f2a5ab4f4497d7703b1",
+      "comfy_custom_nodes/crop_integrity/vendor/schp/transforms.py": "196e0ef23983b20838001a832250dd72819ffe17dfb583fa949093dcfb70af07",
+      "comfy_data/models/human_parsing/exp-schp-201908261155-lip.pth": "24fa3254ceeb74c8435458994a64b522fb439a3635b7b86ff470457e0413da00",
+      "comfy_data/models/human_parsing/exp-schp-201908301523-atr.pth": "e9d7c91ce3b4e7133df56b599fc817b533e3439c5e8d282a59126d2fda339a2a"
+    }
+  },
+  "query": "docker exec rescue-comfy-20261122 python3: git rev-parse HEAD; git status --porcelain; SHA256 of local node source files; GET http://127.0.0.1:8192/object_info",
+  "workflow_nodes": [
+    {
+      "id": "3",
+      "class_type": "KSampler",
+      "python_module": "nodes"
+    },
+    {
+      "id": "8",
+      "class_type": "VAEDecode",
+      "python_module": "nodes"
+    },
+    {
+      "id": "23",
+      "class_type": "CLIPTextEncode",
+      "python_module": "nodes"
+    },
+    {
+      "id": "26",
+      "class_type": "FluxGuidance",
+      "python_module": "comfy_extras.nodes_flux"
+    },
+    {
+      "id": "32",
+      "class_type": "VAELoader",
+      "python_module": "nodes"
+    },
+    {
+      "id": "38",
+      "class_type": "InpaintModelConditioning",
+      "python_module": "nodes"
+    },
+    {
+      "id": "49",
+      "class_type": "SafeICLoraCompose",
+      "python_module": "custom_nodes.crop_integrity"
+    },
+    {
+      "id": "50",
+      "class_type": "LoadImage",
+      "python_module": "nodes"
+    },
+    {
+      "id": "59",
+      "class_type": "LoadImage",
+      "python_module": "nodes"
+    },
+    {
+      "id": "70",
+      "class_type": "PreviewImage",
+      "python_module": "nodes"
+    },
+    {
+      "id": "74",
+      "class_type": "ConditioningZeroOut",
+      "python_module": "nodes"
+    },
+    {
+      "id": "77",
+      "class_type": "LoraLoaderModelOnly",
+      "python_module": "nodes"
+    },
+    {
+      "id": "79",
+      "class_type": "StyleModelApply",
+      "python_module": "nodes"
+    },
+    {
+      "id": "80",
+      "class_type": "StyleModelLoader",
+      "python_module": "nodes"
+    },
+    {
+      "id": "81",
+      "class_type": "CLIPVisionEncode",
+      "python_module": "nodes"
+    },
+    {
+      "id": "82",
+      "class_type": "CLIPVisionLoader",
+      "python_module": "nodes"
+    },
+    {
+      "id": "88",
+      "class_type": "ImageCrop+",
+      "python_module": "custom_nodes.ComfyUI_essentials"
+    },
+    {
+      "id": "115",
+      "class_type": "INPAINT_ExpandMask",
+      "python_module": "custom_nodes.ComfyUI-Inpaint-Nodes"
+    },
+    {
+      "id": "142",
+      "class_type": "UnetLoaderGGUF",
+      "python_module": "custom_nodes.ComfyUI-GGUF"
+    },
+    {
+      "id": "143",
+      "class_type": "DualCLIPLoaderGGUF",
+      "python_module": "custom_nodes.ComfyUI-GGUF"
+    },
+    {
+      "id": "153",
+      "class_type": "LoraLoaderModelOnly",
+      "python_module": "nodes"
+    },
+    {
+      "id": "154",
+      "class_type": "AdaptiveClothingSegment",
+      "python_module": "custom_nodes.crop_integrity"
+    },
+    {
+      "id": "155",
+      "class_type": "SAMModelLoader (segment anything)",
+      "python_module": "custom_nodes.comfyui_segment_anything"
+    },
+    {
+      "id": "156",
+      "class_type": "GroundingDinoModelLoader (segment anything)",
+      "python_module": "custom_nodes.comfyui_segment_anything"
+    },
+    {
+      "id": "162",
+      "class_type": "AdaptiveClothingSegment",
+      "python_module": "custom_nodes.crop_integrity"
+    },
+    {
+      "id": "188",
+      "class_type": "ValidatePersonCrop",
+      "python_module": "custom_nodes.crop_integrity"
+    }
+  ]
+}

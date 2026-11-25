@@ -1,0 +1,6 @@
+numpy>=1.24
+Pillow>=10.0
+scipy>=1.10
+
+# Optional for better face/pose scoring in run_fidelity_comparison.py
+mediapipe>=0.10

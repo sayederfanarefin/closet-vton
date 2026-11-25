@@ -1,0 +1,101 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Dockerfile.gpu
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 1) Base: Ubuntu 22.04 + CUDA runtime (for GPU‐accelerated PyTorch)
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+# 2) Install system dependencies
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      git \
+      python3 \
+      python3-pip \
+      python3-venv \
+      python3-dev \
+      ca-certificates \
+      libgl1 \
+      libglib2.0-0 \
+      libsm6 \
+      libxext6 \
+      libxrender1 \
+      libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3) Clone ComfyUI into /opt/ComfyUI
+WORKDIR /opt
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git /opt/ComfyUI && git -C /opt/ComfyUI checkout b8f848bfe38be79b9dba693bc7a214c9aefd597a
+
+# 4) Install ComfyUI’s own requirements
+WORKDIR /opt/ComfyUI
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install -r requirements.txt
+
+# 4b) Install required custom nodes used by workflow_api.json
+# - AddMaskForICLora: https://github.com/lrzjason/Comfyui-In-Context-Lora-Utils
+# - GGUF loaders (UnetLoaderGGUF, DualCLIPLoaderGGUF): https://github.com/city96/ComfyUI-GGUF
+# - INPAINT_ExpandMask: https://github.com/acly/ComfyUI-Inpaint-Nodes
+# - ImageCrop+: https://github.com/cubiq/ComfyUI_essentials
+# - Segment Anything + GroundingDINO: https://github.com/storyicon/comfyui_segment_anything
+WORKDIR /opt/ComfyUI/custom_nodes
+RUN set -eux; \
+    git clone https://github.com/lrzjason/Comfyui-In-Context-Lora-Utils.git; git -C Comfyui-In-Context-Lora-Utils checkout ede1f33f5889f9f6d5bcb3cc54a5904869f31a41; \
+    git clone https://github.com/city96/ComfyUI-GGUF.git; git -C ComfyUI-GGUF checkout 6ea2651e7df66d7585f6ffee804b20e92fb38b8a; \
+    git clone https://github.com/acly/ComfyUI-Inpaint-Nodes.git; git -C ComfyUI-Inpaint-Nodes checkout b02942210daad35db71f654038cebd541e81fe17; \
+    git clone https://github.com/cubiq/ComfyUI_essentials.git; git -C ComfyUI_essentials checkout 9d9f4bedfc9f0321c19faf71855e228c93bd0dc9; \
+    git clone https://github.com/storyicon/comfyui_segment_anything.git; git -C comfyui_segment_anything checkout ab6395596399d5048639cdab7e44ec9fae857a93; \
+    python3 -m pip install --no-cache-dir "git+https://github.com/facebookresearch/segment-anything.git"; \
+    python3 -m pip install --upgrade gguf; \
+    for d in /opt/ComfyUI/custom_nodes/*; do \
+        if [ -f "$d/requirements.txt" ]; then python3 -m pip install -r "$d/requirements.txt"; fi; \
+    done
+
+# comfyui_segment_anything bundles GroundingDINO which is sensitive to transformers API changes.
+# Patch its bertwarper.py for compatibility (keeps the workflow working across transformers versions).
+COPY provenance/segment_anything_bertwarper.patch /tmp/bertwarper.patch
+RUN git -C /opt/ComfyUI/custom_nodes/comfyui_segment_anything apply /tmp/bertwarper.patch
+
+# 5) Copy our app files (workflow JSON, FastAPI wrapper, etc.)
+#    – Make sure `serve_workflow.py` and `workflow_api.json` are in your build context
+#    – Also copy `prepare_models.py` if you need to prune/download models at build time
+WORKDIR /app
+COPY comfy_custom_nodes/crop_integrity /opt/ComfyUI/custom_nodes/crop_integrity
+COPY requirements.api.txt workflow_api.json prepare_models.py serve_workflow.py ./
+
+# 6) Install our Python dependencies (FastAPI, uvicorn, websocket-client, etc.)
+#    This second requirements.txt must list exactly:
+#      fastapi
+#      uvicorn
+#      websocket-client
+#      # plus any other small helper libs you need
+#    It MUST NOT contain ComfyUI’s Git URL (we installed that above).
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install -r requirements.api.txt
+
+# 7) Model weights
+#    Recommended: mount a host folder to /opt/ComfyUI/models to avoid re-downloading on every rebuild.
+#    Optional: set --build-arg DOWNLOAD_MODELS=1 to bake the workflow's required weights into the image.
+ARG DOWNLOAD_MODELS=0
+ENV COMFYUI_DIR=/opt/ComfyUI
+RUN if [ "${DOWNLOAD_MODELS}" = "1" ]; then python3 prepare_models.py; else echo "Skipping model download (DOWNLOAD_MODELS!=1)"; fi
+
+# 8) Expose port 8188 (ComfyUI WS + our FastAPI both use 8188)
+EXPOSE 8188
+EXPOSE 8000
+
+# 9) ENTRYPOINT: start ComfyUI (headless WS), wait a few seconds, then run Uvicorn
+#
+#    - We background ComfyUI (it listens on ws://0.0.0.0:8188/ws).
+#    - We sleep 10 seconds to let ComfyUI finish loading models.
+#      (If your models are large, bump this to 15 or 20.)
+#    - Then we `cd /app` so that Python can import `serve_workflow.py`.
+#    - Finally, we launch Uvicorn to serve FastAPI on 0.0.0.0:8188.
+#    - The whole thing runs in one shell via `bash -c "…"` so both processes share the same container.
+#
+ENTRYPOINT ["/bin/bash", "-c", "\
+    python3 -u /opt/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch & \
+    sleep 10 && \
+    cd /app && \
+    uvicorn serve_workflow:app --host 0.0.0.0 --port 8000 \
+"]
+# ─────────────────────────────────────────────────────────────────────────────

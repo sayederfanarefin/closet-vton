@@ -1,0 +1,31 @@
+diff --git a/local_groundingdino/models/GroundingDINO/bertwarper.py b/local_groundingdino/models/GroundingDINO/bertwarper.py
+index e209a39..8ff68a3 100644
+--- a/local_groundingdino/models/GroundingDINO/bertwarper.py
++++ b/local_groundingdino/models/GroundingDINO/bertwarper.py
+@@ -22,7 +22,16 @@ class BertModelWarper(nn.Module):
+ 
+         self.get_extended_attention_mask = bert_model.get_extended_attention_mask
+         self.invert_attention_mask = bert_model.invert_attention_mask
+-        self.get_head_mask = bert_model.get_head_mask
++        # transformers compatibility: some versions don't expose get_head_mask on model instances
++        if hasattr(bert_model, 'get_head_mask'):
++            self.get_head_mask = bert_model.get_head_mask
++        else:
++            try:
++                from transformers.modeling_utils import PreTrainedModel
++                self.get_head_mask = PreTrainedModel.get_head_mask.__get__(bert_model, bert_model.__class__)
++            except Exception:
++                # GroundingDINO doesn't rely on head masks for our use-case.
++                self.get_head_mask = lambda head_mask, num_hidden_layers, is_attention_chunked=False: [None] * num_hidden_layers
+ 
+     def forward(
+         self,
+@@ -103,7 +112,7 @@ class BertModelWarper(nn.Module):
+         # We can provide a self-attention mask of dimensions [batch_size, from_seq_length, to_seq_length]
+         # ourselves in which case we just need to make it broadcastable to all heads.
+         extended_attention_mask: torch.Tensor = self.get_extended_attention_mask(
+-            attention_mask, input_shape, device
++            attention_mask, input_shape
+         )
+ 
+         # If a 2D or 3D attention mask is provided for the cross-attention

@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+websocket-client
+python-multipart
+requests
+tqdm
+Pillow
+numpy

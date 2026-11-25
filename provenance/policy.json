@@ -1,0 +1,14 @@
+{
+  "version": "semantic_rescue_v1",
+  "invoke_only_after_earlier_policy_rejects": true,
+  "old_accepted_images_preserved": true,
+  "target_fallback": "SCHP ATR independently inferred upper-clothes/dress labels",
+  "parser_min_flip_iou": 0.8,
+  "parser_min_mean_class_posterior": 0.65,
+  "crop_top_anatomy": "upper-clothes label fraction >=.90; >=.90 mask above parsed lower-garment waist; all other head/area/upper-body checks preserved",
+  "reference_fallback": "SAM multimask; preserve disconnected garment parts >=16px within detection box; original SAM IoU>=.8/stability>=.85 checks retained, otherwise SCHP",
+  "no_eval_masks_used_for_inference": true,
+  "attempt_number": 3,
+  "warmup": "324 segmentation-only cases followed by 10 full-render smoke cases before timed retry run",
+  "full_generation_settings_unchanged": true
+}

@@ -1,0 +1,7 @@
+The destination repository supplies an Apache-2.0 LICENSE for project code.
+Third-party components and dataset/model artifacts retain their own licenses; the project license does not override them.
+Existing third-party notices/licenses are retained; vendored SCHP has its own LICENSE and provenance.json.
+ComfyUI, custom node packs, models and baseline renderers retain their upstream terms.
+VITON-HD material is described by its official project as research-only and CC BY-NC 4.0;
+this is not a blanket license grant for every file in this release.
+No model weights are distributed in Code or Data.

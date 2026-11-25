@@ -1,0 +1,13 @@
+The data is distributed separately from source code.
+Prepared archive: ClosetVTON_Data_20261125.zip (approximately 4.73 GB).
+Contains 5064 final ClosetVTON predictions, 3000 matched baseline predictions,
+5823 attempt records, manifests, metrics and qualitative/recovery figures.
+Standalone VITON-HD source images and model weights are excluded.
+Kaggle URL: pending authenticated upload. No upload is claimed yet.
+Paper: https://github.com/sayederfanarefin/Saadman-Paper-tryout
+
+Place the extracted Data folder next to this repository and run:
+  python scripts/verify_release.py --release-root .
+  python scripts/prepare_data.py --data-root ../Data --source-root /path/to/zalando-hd-resized --output-dir prepared_manifests
+
+Final results retain accepted predictions and add successful retries; they are not a fresh first-pass benchmark.

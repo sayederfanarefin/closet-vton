@@ -1,0 +1,11 @@
+{
+  "source": "external_vtons/catvton/model/SCHP",
+  "git_commit": "7818397f25613beedb3d861a34769f607cfcf3b1",
+  "weights_hf_snapshot": "2969fcf85fe62f2036605716f0b56f0b81d01d79",
+  "files": {
+    "comfy_custom_nodes/crop_integrity/vendor/schp/architecture.py": "9092adf2e3c932f5559c4b16e1067cff268c2959358a9f2a5ab4f4497d7703b1",
+    "comfy_custom_nodes/crop_integrity/vendor/schp/transforms.py": "196e0ef23983b20838001a832250dd72819ffe17dfb583fa949093dcfb70af07",
+    "comfy_data/models/human_parsing/exp-schp-201908261155-lip.pth": "24fa3254ceeb74c8435458994a64b522fb439a3635b7b86ff470457e0413da00",
+    "comfy_data/models/human_parsing/exp-schp-201908301523-atr.pth": "e9d7c91ce3b4e7133df56b599fc817b533e3439c5e8d282a59126d2fda339a2a"
+  }
+}

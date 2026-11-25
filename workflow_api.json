@@ -1,0 +1,424 @@
+{
+    "3": {
+        "inputs": {
+            "seed": 565287828599082,
+            "steps": 8,
+            "cfg": 1,
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "denoise": 1,
+            "model": [
+                "153",
+                0
+            ],
+            "positive": [
+                "38",
+                0
+            ],
+            "negative": [
+                "38",
+                1
+            ],
+            "latent_image": [
+                "38",
+                2
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSampler"
+        }
+    },
+    "8": {
+        "inputs": {
+            "samples": [
+                "3",
+                0
+            ],
+            "vae": [
+                "32",
+                0
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "23": {
+        "inputs": {
+            "text": "",
+            "clip": [
+                "143",
+                0
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Positive Prompt)"
+        }
+    },
+    "26": {
+        "inputs": {
+            "guidance": 30,
+            "conditioning": [
+                "79",
+                0
+            ]
+        },
+        "class_type": "FluxGuidance",
+        "_meta": {
+            "title": "FluxGuidance"
+        }
+    },
+    "32": {
+        "inputs": {
+            "vae_name": "ae.sft"
+        },
+        "class_type": "VAELoader",
+        "_meta": {
+            "title": "Load VAE"
+        }
+    },
+    "38": {
+        "inputs": {
+            "noise_mask": true,
+            "positive": [
+                "26",
+                0
+            ],
+            "negative": [
+                "74",
+                0
+            ],
+            "vae": [
+                "32",
+                0
+            ],
+            "pixels": [
+                "49",
+                0
+            ],
+            "mask": [
+                "49",
+                1
+            ]
+        },
+        "class_type": "InpaintModelConditioning",
+        "_meta": {
+            "title": "InpaintModelConditioning"
+        }
+    },
+    "49": {
+        "inputs": {
+            "patch_mode": "patch_right",
+            "output_length": 1536,
+            "patch_color": "#FF0000",
+            "first_image": [
+                "162",
+                0
+            ],
+            "second_image": [
+                "59",
+                0
+            ],
+            "second_mask": [
+                "115",
+                0
+            ]
+        },
+        "class_type": "SafeICLoraCompose",
+        "_meta": {
+            "title": "Safe IC-LoRA composition (reject empty target mask)"
+        }
+    },
+    "50": {
+        "inputs": {
+            "image": "PINK.jpeg"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "ClothesImage"
+        }
+    },
+    "59": {
+        "inputs": {
+            "image": "CEX.jpeg"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "PeoplePhoto"
+        }
+    },
+    "70": {
+        "inputs": {
+            "images": [
+                "188",
+                0
+            ]
+        },
+        "class_type": "PreviewImage",
+        "_meta": {
+            "title": "Preview Image"
+        }
+    },
+    "74": {
+        "inputs": {
+            "conditioning": [
+                "26",
+                0
+            ]
+        },
+        "class_type": "ConditioningZeroOut",
+        "_meta": {
+            "title": "ConditioningZeroOut"
+        }
+    },
+    "77": {
+        "inputs": {
+            "lora_name": "diffusion_pytorch_model.safetensors",
+            "strength_model": 1.0000000000000002,
+            "model": [
+                "142",
+                0
+            ]
+        },
+        "class_type": "LoraLoaderModelOnly",
+        "_meta": {
+            "title": "LoraLoaderModelOnly"
+        }
+    },
+    "79": {
+        "inputs": {
+            "conditioning": [
+                "23",
+                0
+            ],
+            "style_model": [
+                "80",
+                0
+            ],
+            "clip_vision_output": [
+                "81",
+                0
+            ]
+        },
+        "class_type": "StyleModelApply",
+        "_meta": {
+            "title": "StyleModelApply"
+        }
+    },
+    "80": {
+        "inputs": {
+            "style_model_name": "flux1-redux-dev.safetensors"
+        },
+        "class_type": "StyleModelLoader",
+        "_meta": {
+            "title": "Load Style Model"
+        }
+    },
+    "81": {
+        "inputs": {
+            "crop": "center",
+            "clip_vision": [
+                "82",
+                0
+            ],
+            "image": [
+                "50",
+                0
+            ]
+        },
+        "class_type": "CLIPVisionEncode",
+        "_meta": {
+            "title": "CLIP Vision Encode"
+        }
+    },
+    "82": {
+        "inputs": {
+            "clip_name": "sigclip_vision_patch14_384.safetensors"
+        },
+        "class_type": "CLIPVisionLoader",
+        "_meta": {
+            "title": "Load CLIP Vision"
+        }
+    },
+    "88": {
+        "inputs": {
+            "width": [
+                "49",
+                4
+            ],
+            "height": [
+                "49",
+                5
+            ],
+            "position": "top-left",
+            "x_offset": [
+                "49",
+                2
+            ],
+            "y_offset": [
+                "49",
+                3
+            ],
+            "image": [
+                "8",
+                0
+            ]
+        },
+        "class_type": "ImageCrop+",
+        "_meta": {
+            "title": "\ud83d\udd27 Image Crop"
+        }
+    },
+    "115": {
+        "inputs": {
+            "grow": 10,
+            "blur": 10,
+            "mask": [
+                "154",
+                1
+            ]
+        },
+        "class_type": "INPAINT_ExpandMask",
+        "_meta": {
+            "title": "Expand Mask"
+        }
+    },
+    "142": {
+        "inputs": {
+            "unet_name": "flux1-fill-dev-fp16-Q8_0-GGUF.gguf"
+        },
+        "class_type": "UnetLoaderGGUF",
+        "_meta": {
+            "title": "Unet Loader (GGUF)"
+        }
+    },
+    "143": {
+        "inputs": {
+            "clip_name1": "t5-v1_1-xxl-encoder-Q6_K.gguf",
+            "clip_name2": "clip_l.safetensors",
+            "type": "flux"
+        },
+        "class_type": "DualCLIPLoaderGGUF",
+        "_meta": {
+            "title": "DualCLIPLoader (GGUF)"
+        }
+    },
+    "153": {
+        "inputs": {
+            "lora_name": "pytorch_lora_weights.safetensors",
+            "strength_model": 1.0000000000000002,
+            "model": [
+                "142",
+                0
+            ]
+        },
+        "class_type": "LoraLoaderModelOnly",
+        "_meta": {
+            "title": "LoraLoaderModelOnly"
+        }
+    },
+    "154": {
+        "inputs": {
+            "prompt": "outfit",
+            "threshold": 0.7500000000000001,
+            "sam_model": [
+                "155",
+                0
+            ],
+            "grounding_dino_model": [
+                "156",
+                0
+            ],
+            "image": [
+                "59",
+                0
+            ],
+            "role": "target"
+        },
+        "class_type": "AdaptiveClothingSegment",
+        "_meta": {
+            "title": "GroundingDinoSAMSegment (segment anything)"
+        }
+    },
+    "155": {
+        "inputs": {
+            "model_name": "sam_vit_b (375MB)"
+        },
+        "class_type": "SAMModelLoader (segment anything)",
+        "_meta": {
+            "title": "SAMModelLoader (segment anything)"
+        }
+    },
+    "156": {
+        "inputs": {
+            "model_name": "GroundingDINO_SwinT_OGC (694MB)"
+        },
+        "class_type": "GroundingDinoModelLoader (segment anything)",
+        "_meta": {
+            "title": "GroundingDinoModelLoader (segment anything)"
+        }
+    },
+    "162": {
+        "inputs": {
+            "prompt": "outfit",
+            "threshold": 0.7500000000000001,
+            "sam_model": [
+                "155",
+                0
+            ],
+            "grounding_dino_model": [
+                "156",
+                0
+            ],
+            "image": [
+                "50",
+                0
+            ],
+            "role": "reference"
+        },
+        "class_type": "AdaptiveClothingSegment",
+        "_meta": {
+            "title": "GroundingDinoSAMSegment (segment anything)"
+        }
+    },
+    "188": {
+        "class_type": "ValidatePersonCrop",
+        "inputs": {
+            "image": [
+                "88",
+                0
+            ],
+            "canvas": [
+                "49",
+                0
+            ],
+            "target_mask": [
+                "154",
+                1
+            ],
+            "grounding_dino_model": [
+                "156",
+                0
+            ],
+            "x": [
+                "49",
+                2
+            ],
+            "y": [
+                "49",
+                3
+            ],
+            "width": [
+                "49",
+                4
+            ],
+            "height": [
+                "49",
+                5
+            ]
+        }
+    }
+}
