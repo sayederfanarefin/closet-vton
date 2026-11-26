@@ -3,7 +3,10 @@ Prepared archive: ClosetVTON_Data_20261125.zip (approximately 4.73 GB).
 Contains 5064 final ClosetVTON predictions, 3000 matched baseline predictions,
 5823 attempt records, manifests, metrics and qualitative/recovery figures.
 Standalone VITON-HD source images and model weights are excluded.
-Kaggle URL: pending authenticated upload. No upload is claimed yet.
+Kaggle URL: https://www.kaggle.com/datasets/sayederfanarefin/closetvton-final-cascade-evaluation
+Version 1 is uploaded and ready; visibility is private until the owner publishes it.
+Kaggle unpacks the archive as ClosetVTON_Data_20261125/Data/. Place that Data folder
+next to this checkout, or pass its full path to scripts/prepare_data.py.
 Paper: https://github.com/sayederfanarefin/Saadman-Paper-tryout
 
 Place the extracted Data folder next to this repository and run:
