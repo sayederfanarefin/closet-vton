@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "closet_attempts": 5823,
+  "closet_accepted": 5064,
+  "closet_stage_counts": {
+    "1": 4391,
+    "2": 587,
+    "3": 86
+  },
+  "client_and_service_medians": [
+    {
+      "protocol": "paired",
+      "p50": "10.7466",
+      "service_p50": "9.977675297763199"
+    },
+    {
+      "protocol": "unpaired",
+      "p50": "11.3371",
+      "service_p50": "10.179020867682993"
+    },
+    {
+      "protocol": "worn_1000",
+      "p50": "11.0696",
+      "service_p50": "10.33411472523585"
+    }
+  ],
+  "rag_original_macro_ndcg": {
+    "forced_hybrid": 0.8989992667668512,
+    "full_auto": 0.8481627249813588
+  },
+  "rag_matched_models": 22,
+  "rag_matched_n": 496,
+  "qualitative_png_resize": "Pillow LANCZOS 4880x4710 to 2400x2316, RGB MAE 0.0, checked separately"
+}

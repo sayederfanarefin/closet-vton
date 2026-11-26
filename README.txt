@@ -44,3 +44,7 @@ Historical bulk shell runners reference original run layouts; use prepared manif
 
 No inference is performed by export/verification. The final reported cohort is retained outputs plus successful retries.
 The existing repository LICENSE specifies Apache-2.0 for project code; third-party components retain their own terms. See THIRD_PARTY_NOTICES.txt.
+
+Detailed paper-to-data/code README: artifact_maps/README_RESULTS_MAP.txt
+Machine-readable crosswalk: artifact_maps/artifact_map.csv
+C: paths in that README refer to this repository root; P: paths refer to the paper repository.
