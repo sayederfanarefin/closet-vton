@@ -1,6 +1,5 @@
 ClosetVTON — standalone code accompanying the paper
 Code repository: https://github.com/sayederfanarefin/closet-vton
-Paper repository: https://github.com/sayederfanarefin/Saadman-Paper-tryout
 
 This folder contains renderer/API, final workflow, local adaptive segmentation/crop nodes,
 evaluation scripts and focused tests. It excludes model weights, dataset images, credentials,
@@ -47,4 +46,4 @@ The existing repository LICENSE specifies Apache-2.0 for project code; third-par
 
 Detailed paper-to-data/code README: artifact_maps/README_RESULTS_MAP.txt
 Machine-readable crosswalk: artifact_maps/artifact_map.csv
-C: paths in that README refer to this repository root; P: paths refer to the paper repository.
+C: paths in that README refer to this repository root; P: paths refer to the manuscript source folder.

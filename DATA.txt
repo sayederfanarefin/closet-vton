@@ -7,7 +7,6 @@ Kaggle URL: https://www.kaggle.com/datasets/sayederfanarefin/closetvton-final-ca
 Version 1 is uploaded and ready; visibility is private until the owner publishes it.
 Kaggle unpacks the archive as ClosetVTON_Data_20261125/Data/. Place that Data folder
 next to this checkout, or pass its full path to scripts/prepare_data.py.
-Paper: https://github.com/sayederfanarefin/Saadman-Paper-tryout
 
 Place the extracted Data folder next to this repository and run:
   python scripts/verify_release.py --release-root .

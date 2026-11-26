@@ -2,13 +2,12 @@ Paper figure, table and result crosswalk — closet — 2026-11-25
 
 Scope: active figures/tables recursively included by main-access.tex.
 Numbers follow source declaration order; LaTeX labels are authoritative across revisions.
-P: means the paper repository root. C: means the code root. D: means the extracted Data folder.
-Commands marked P: run in the paper checkout; functions marked C: are implementation entry points.
+P: means the manuscript source folder. C: means the code root. D: means the extracted Data folder.
+Commands marked P: run in the manuscript source folder; functions marked C: are implementation entry points.
 The mapping is evidence linkage, not a claim that every historical pixel or every manuscript sentence
 has been independently regenerated. Explicitly partial/missing links are recorded below.
 No prediction, metric, frozen result file or manuscript quantitative content was modified.
 
-Paper: https://github.com/sayederfanarefin/Saadman-Paper-tryout
 Code: https://github.com/sayederfanarefin/closet-vton (also snapshotted under paper Code/)
 Data: https://www.kaggle.com/datasets/sayederfanarefin/closetvton-final-cascade-evaluation
 Kaggle version 1 is private as uploaded. Extracted path is ClosetVTON_Data_20261125/Data/.
