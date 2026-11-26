@@ -8,14 +8,12 @@ from pathlib import Path
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--release-root', type=Path, required=True)
+    p.add_argument('--data-root', type=Path, required=True)
     args = p.parse_args()
-    root = args.release_root.resolve()
+    root = Path(__file__).resolve().parents[1]
     checked = 0
     for folder in ['Code', 'Data']:
-        base = root / folder
-        if folder == "Code" and not base.is_dir(): base = root
-        if folder == "Data" and not base.is_dir(): base = root.parent / "Data"
+        base = root if folder == "Code" else args.data_root.resolve()
         for line in (base / 'checksums.sha256').read_text().splitlines():
             expected, rel = line.split('  ', 1)
             path = base / rel
@@ -25,7 +23,7 @@ def main():
                 for b in iter(lambda: f.read(1024 * 1024), b''): h.update(b)
             assert h.hexdigest() == expected, path
             checked += 1
-    data_base = root / 'Data' if (root / 'Data').is_dir() else root.parent / 'Data'
+    data_base = args.data_root.resolve()
     for protocol, n in [('paired', 2032), ('unpaired', 2032), ('worn_1000', 1000)]:
         rows = [json.loads(l) for l in (data_base / 'manifests' / (protocol + '.jsonl')).read_text().splitlines()]
         assert len(rows) == len({r['id'] for r in rows}) == n

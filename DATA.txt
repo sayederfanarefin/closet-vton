@@ -1,15 +1,16 @@
-The data is distributed separately from source code.
-Prepared archive: ClosetVTON_Data_20261125.zip (approximately 4.73 GB).
-Contains 5064 final ClosetVTON predictions, 3000 matched baseline predictions,
-5823 attempt records, manifests, metrics and qualitative/recovery figures.
-Standalone VITON-HD source images and model weights are excluded.
-Kaggle URL: https://www.kaggle.com/datasets/sayederfanarefin/closetvton-final-cascade-evaluation
-Version 1 is uploaded and ready; visibility is private until the owner publishes it.
-Kaggle unpacks the archive as ClosetVTON_Data_20261125/Data/. Place that Data folder
-next to this checkout, or pass its full path to scripts/prepare_data.py.
+ClosetVTON data — final version 2
+https://www.kaggle.com/datasets/sayederfanarefin/closetvton-final-cascade-evaluation
+Download version 2. Its Kaggle extraction root is ClosetVTON_Data_v2/Data/.
+Visibility remains private unless changed by the owner.
 
-Place the extracted Data folder next to this repository and run:
-  python scripts/verify_release.py --release-root .
-  python scripts/prepare_data.py --data-root ../Data --source-root /path/to/zalando-hd-resized --output-dir prepared_manifests
+5064 final accepted ClosetVTON predictions; 3000 matched baseline predictions;
+5823 evaluation attempt records; reported per-pair metrics, tables and active figures.
+Ten separate archived predictions reconstruct five outside-cohort qualitative examples.
+Those ten are illustrations, not additional evaluation cases.
+Source photographs and pretrained weights are obtained separately.
 
-Final results retain accepted predictions and add successful retries; they are not a fresh first-pass benchmark.
+  python scripts/verify_release.py --data-root /path/to/Data
+  python scripts/prepare_data.py --data-root /path/to/Data --source-root /path/to/zalando-hd-resized --output-dir prepared_manifests
+
+Original version 1 is preserved. No original prediction or metric was changed.
+See README.txt, artifact_maps/ and the downloaded dataset's TERMS.txt.

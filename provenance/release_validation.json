@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-26",
+  "data_version": 2,
+  "tests_passed": 18,
+  "paired_means_reproduced": 5,
+  "completion_and_client_latency_match": true,
+  "four_model_values_reproduced": 40,
+  "reported_catvton_cells_reproduced": 42,
+  "quantitative_figures_rebuilt": 5,
+  "qualitative_figures_pixel_identical": 2,
+  "architecture_compiled": true,
+  "renderer_workflow_and_metric_kernels_unchanged": true,
+  "gpu_rebuilt_or_rerun": false,
+  "original_data_modified": false
+}

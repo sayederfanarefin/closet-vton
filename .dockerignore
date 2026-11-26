@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+models
+input
+output
+Data
+data
+results
+prepared_manifests
+*.zip

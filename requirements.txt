@@ -1,19 +1,6 @@
+-r requirements.api.txt
 torch
 torchvision
-torchaudio
-transformers
-opencv-python-headless
-numpy
-Pillow
 scipy
-scikit-image
 lpips
-clip
-ftfy
-regex
-requests
-tqdm
-fastapi
-uvicorn
-websocket-client
-python-multipart
+matplotlib

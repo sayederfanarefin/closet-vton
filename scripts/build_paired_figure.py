@@ -1,4 +1,5 @@
 """Assemble final accepted paired predictions at native resolution; no inference."""
+import argparse
 import csv
 import hashlib
 import json
@@ -6,19 +7,33 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
-ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / 'experiments/results/segmentation_rescue_20261122'
-OUT = ROOT / 'figures'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--data-root', type=Path, required=True)
+parser.add_argument('--source-root', type=Path, required=True, help='VITON-HD root containing test/')
+parser.add_argument('--outdir', type=Path, required=True)
+args = parser.parse_args()
+DATA = args.data_root.resolve()
+SOURCE = args.source_root.resolve()
+OUT = args.outdir.resolve()
+OUT.mkdir(parents=True, exist_ok=False)
+
+def source_path(relative):
+    return SOURCE / Path(*Path(relative).parts[2:])
+
 COLUMNS = [('Worst', ['12651_00', '11985_00']),
            ('Median', ['11851_00', '11127_00']),
            ('Best', ['04766_00', '09969_00'])]
 
 
 def main():
-    metrics_path = RESULTS / 'paired_per_sample_metrics.csv'
-    records_path = RESULTS / 'merged_runs/paired/results.jsonl'
+    metrics_path = DATA / 'metrics/recovery/paired_per_sample_metrics.csv'
+    records_path = DATA / 'manifests/paired.jsonl'
     metrics = {r['id']: r for r in csv.DictReader(metrics_path.open())}
-    records = {r['id']: r for r in map(json.loads, records_path.read_text().splitlines())}
+    records = {}
+    for row in map(json.loads, records_path.read_text().splitlines()):
+        records[row['id']] = dict(status='ok', telemetry=dict(valid=row['valid'], attempt_number=row['attempt_number']),
+            person_path=str(source_path(row['person'])), cloth_path=str(source_path(row['cloth'])),
+            gt_path=str(source_path(row['gt'])), pred_path=str(DATA / row['pred']))
     # Images are pasted 1:1; only the physical print scale is set using PNG DPI.
     panel_w, panel_h, inner_gap, outer_gap, margin = 768, 1024, 16, 72, 40
     case_w, case_h = 2 * panel_w + inner_gap, 2240
@@ -43,7 +58,7 @@ def main():
             attempt = int(record['telemetry']['attempt_number'])
             assert attempt in (1, 2, 3)
             score = metrics[image_id]['ssim_masked_after']
-            pred = RESULTS / 'merged_runs/paired/images/pred' / (image_id + '.png')
+            pred = Path(record['pred_path'])
             assert pred.resolve() == Path(record['pred_path']).resolve()
             y = margin + 90 + row_index * (case_h + 60)
             center(f'{image_id} | Attempt {attempt} | Masked SSIM {float(score):.4f}', x, y, case_w)

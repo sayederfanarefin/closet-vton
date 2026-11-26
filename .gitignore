@@ -9,3 +9,12 @@ prepared_manifests/
 *.pth
 *.safetensors
 *.gguf
+
+.pytest_cache/
+results/
+
+Data/
+data/
+*.zip
+*.aux
+*.log

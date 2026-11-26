@@ -221,7 +221,7 @@ def main() -> None:
 
     # Metrics options
     p.add_argument("--resize-to-gt", action="store_true", help="Resize prediction to GT size before metrics (recommended).")
-    p.add_argument("--no-metrics", action="store_true", help="Skip reference metrics (PSNR/SSIM); still allows optional conditional metrics like PHaR.")
+    p.add_argument("--no-metrics", action="store_true", help="Skip reference metrics (PSNR/SSIM).")
     p.add_argument("--lpips", action="store_true", help="Compute paired LPIPS perceptual distance (lower is better; requires GT).")
     p.add_argument("--lpips-net", choices=["alex", "vgg", "squeeze"], default=os.getenv("LPIPS_NET", "alex"))
     p.add_argument("--lpips-device", default=os.getenv("LPIPS_DEVICE", ""), help="LPIPS device (e.g. cuda or cpu). Default: auto.")
@@ -234,15 +234,6 @@ def main() -> None:
         help="How to materialize triplet files: symlink (default), hardlink, or copy.",
     )
 
-    # Conditional VTON metric (no ground-truth required)
-    p.add_argument("--phar", action="store_true", help="Compute PHaR (Physically-grounded Human Apparel Realism) per sample.")
-    p.add_argument("--phar-device", default=os.getenv("PHAR_DEVICE", ""), help="Device for PHaR (e.g., cuda, cpu). Default: auto.")
-    p.add_argument("--phar-no-pose", action="store_true", help="Disable pose-based parts of PHaR (faster; no KeypointRCNN).")
-    p.add_argument(
-        "--phar-clip-model",
-        default=os.getenv("PHAR_CLIP_MODEL", "openai/clip-vit-base-patch32"),
-        help="HuggingFace CLIP model id used by PHaR.",
-    )
 
     args = p.parse_args()
 
@@ -300,10 +291,6 @@ def main() -> None:
             "save_comparisons": bool(args.save_comparisons),
             "save_triplets": bool(args.save_triplets),
             "triplets_mode": args.triplets_mode,
-            "phar": bool(args.phar),
-            "phar_device": args.phar_device or None,
-            "phar_no_pose": bool(args.phar_no_pose),
-            "phar_clip_model": args.phar_clip_model,
         },
         "counts": {
             "samples_total": len(samples),
@@ -345,24 +332,6 @@ def main() -> None:
 
     results_path = run_dir / "results.jsonl"
 
-    phar_scorer = None
-    if args.phar:
-        from evaluation.phar import PharConfig, PharScorer
-
-        phar_cfg = PharConfig(clip_model=args.phar_clip_model)
-        phar_device = args.phar_device or None
-        phar_scorer = PharScorer(phar_cfg, device=phar_device, enable_pose=(not args.phar_no_pose))
-        _write_json(
-            run_dir / "phar_info.json",
-            {
-                "requested_device": phar_device,
-                "resolved_device": str(phar_scorer.device),
-                "torch_cuda_available": bool(torch.cuda.is_available()),
-                "torch_cuda_version": getattr(torch.version, "cuda", None),
-                "enable_pose": bool(not args.phar_no_pose),
-                "clip_model": args.phar_clip_model,
-            },
-        )
 
     lpips_scorer = None
     if args.lpips:
@@ -502,29 +471,6 @@ def main() -> None:
             elif (not args.no_metrics) and (gt is None):
                 row["metrics_note"] = "No ground-truth provided; skipping reference metrics (PSNR/SSIM)."
 
-            if phar_scorer is not None:
-                # PHaR expects person and output to be in the same coordinate system.
-                pred_for_phar = pred
-                if (pred.shape[1] != person.shape[1]) or (pred.shape[2] != person.shape[2]):
-                    pred_for_phar = resize_rgb_tensor(pred, person.shape[1], person.shape[2])
-
-                cloth_mask = None
-                if sample.meta and sample.meta.get("cloth_mask"):
-                    try:
-                        pth = Path(sample.meta["cloth_mask"])
-                        if pth.exists():
-                            cloth_mask = load_mask(pth)
-                    except Exception:
-                        cloth_mask = None
-
-                phar_vals = phar_scorer.score(
-                    person=person,
-                    garment=cloth,
-                    pred=pred_for_phar,
-                    garment_mask=mask,
-                    garment_image_mask=cloth_mask,
-                )
-                row_metrics.update({k: float(v) for k, v in phar_vals.items()})
 
             row["metrics"] = row_metrics if row_metrics else None
             if row_metrics:
@@ -588,11 +534,6 @@ def main() -> None:
         "ssim_mean",
         "psnr_masked_mean",
         "ssim_masked_mean",
-        "phar_mean",
-        "phar_human_mean",
-        "phar_id_mean",
-        "phar_gar_mean",
-        "phar_fit_mean",
         "pred_dir",
     ]
     metrics = summary.get("metrics", {})
@@ -616,11 +557,6 @@ def main() -> None:
         mmean("ssim"),
         mmean("psnr_masked"),
         mmean("ssim_masked"),
-        mmean("phar"),
-        mmean("phar_human"),
-        mmean("phar_id"),
-        mmean("phar_gar"),
-        mmean("phar_fit"),
         "api",
     ]
     _append_run_index_row(index_path, header, row)
